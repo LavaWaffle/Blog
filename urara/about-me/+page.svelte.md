@@ -3,6 +3,7 @@ title: 'About Me'
 summary: 'I am an engineer that loves to build things.'
 created: 2024-07-23
 updated: 2024-07-23
+published: 2024-07-23
 tags: ['About Me']
 ---
 
