@@ -150,26 +150,63 @@ First to practice my mathematics, I solved the inverse trigonometric equations f
 [Work available here](https://drive.google.com/file/d/1hQT2yIbzU4SllDZLqfYMm9NvW1JkTd02/view?usp=sharing) | [Graph available here](https://www.desmos.com/calculator/kd0jjbwytb)
 ![Solution](/projects/mozart/assets/realFrFR.png)
 
-<!-- TODO: Fix image to have background color -->
-
 Then using that equation, I solved for the angle of the control servo for each key on the piano. This worked relatively well, but I had to do some minor tweaking to because the arm was slightly off from some keys sometimes. Overall, the inverse trigonometry was fun, but unnecessary since guess and check would have worked much faster. However, I learned a lot from this process and will definitely use it in future more complex projects where guess and check won't work.
+
+Here are the angles for each key on the piano.
+
+```cpp title="Mozart.ino" {2-9}
+uint8_t noteToControlAngle(char note) {
+  switch(note) {
+    case 'c': return 131;
+    case 'd': return 111;
+    case 'e': return 93;
+    case 'f': return 77;
+    case 'g': return 66;
+    case 'a': return 55;
+    case 'b': return 39;
+    case 'C': return 30;
+    default:
+      Serial.print("[NTCA] Error: Invalid input char {");
+      Serial.print(note);
+      Serial.println("}");
+      return 128; // Return -1 for invalid input
+  }
+}
+
+```
+
+<script>
+	import { YouTube } from 'sveltekit-embed';
+</script>
 
 ##### Mozart App
 
 In order to play any songs on the piano, Mozart needed instructions. So I created a simple app that would send instructions to Mozart from my computer. The app was written in Python due to is simplicity and because of the [Custom Tkinter Library](https://github.com/TomSchimansky/CustomTkinter) which let me easily create an appealing GUI. Then using MuseScore, I created sheet music for each song I wanted to play and saved them as mxl files. Finally, the app reads these mxl files and sends the instructions to Mozart.
 
-<!-- TODO: Add gif / video of app and mozart playing a song -->
+<YouTube youTubeId="0FPuenb9IVw" />
 
 Furthermore, the app interacts with the Windows API in order to scan images from my printer. Originally, I wanted to use a camera to scan the sheet music, but after much testing I wasn't able to get reliable results. Thus, I used my printer to scan the sheet music because its results were more consistent.
 
-<!-- TODO: Add gif / video of app and printer -->
+<YouTube youTubeId="zpyJgRfkxNM" />
 
 ##### Programming Problems
 
 1. When the Servo was given a command to move to a certain angle, it would take a different amount of time depending on the difference between the current angle and the desired angle. Initially, I was just using a constant delay after the Control Servo was given a command no matter what angle was given, but sometimes this would cause the Finger Servo to push down before the Control Servo was done moving. To fix this, I researched different delay methods and found a library called [VarSpeedServo](https://github.com/netlabtoolkit/VarSpeedServo) that allows you to wait until the servo is done moving before continuing, fixing the issue. Additionally, this solved the problem of the Control Servo overshooting the carriage due to the carriage gaining high velocity as the control servo accelerated it, making it hard to precisely move the carriage. Thus, by rotating slower, the carriage moves more smoothly at slower leading to more consistent results.
 
-2. I send Mozart instructions 10 characters at a time. When I began testing Mozart, I noticed that I had to send a 10 character dummy instruction first before the actual song in order for Mozart to play the correct song. At the time I had no idea why it worked, but after adding sight-reading to the app, sending songs completely broke. After lots of testing, I realized the reason why sending songs wasn't working and why I needed to send a dummy instruction: The delay after connecting to the Arduino was too short. The dummy instruction increased that delay which remedied the issue temporarily, but now I removed the dummy instruction and made the delay after connecting longer. In the future, I'll make sure I understand why something words before just going along with it since it caused me such a headache in this project.
+2. I send Mozart instructions 10 characters at a time. When I began testing Mozart, I noticed that I had to send a 10 character dummy instruction first before the actual song in order for Mozart to play the correct song. At the time I had no idea why it worked, but after adding sight-reading to the app, sending songs completely broke. After lots of testing, I realized the reason why sending songs wasn't working and why I needed to send a dummy instruction: The delay after connecting to the Arduino was too short. The dummy instruction increased that delay which temporarily remedied the issue, but now I removed the dummy instruction and made the delay after connecting longer. In the future, I'll make sure I understand why something words before just going along with it since it caused me such a headache in this project.
+
+3. I spent way too much time trying to get the camera scan to work properly. After pretty much a week of testing with different cameras, different settings, and different software, nothing worked. Instead of trying to fix the camera, I should have started from the ground up and initially scanned online sheet music, then move into the printer, and then finally try using a camera. This way, I wouldn't have wasted so much time on the camera portion of Mozart.
+
+![Cameras](/projects/mozart/assets/Cameras.jpg)
+
+4. The Control Servo wasn't accurate enough to play accidentals. Initially, I wanted to play songs that included sharps and flats, but after playing around with Mozart, I realized the Control Servo wasn't accurate enough to place the finger right above the small black keys. Thus, I decided to only play songs that used the white keys since they were much bigger and thus easier to hit.
 
 ### Conclusion
 
-Mozart has been a joy to work on and improved my engineering skills drastically. Building projects that push the boundaries of my knowledge UHH IDK HOW END TODO:
+Mozart can play and sight-read simple songs very consistently. In order to achieve this high accuracy, I made many speed sacrifices such as lowering the servo speed and using my slow printer scanner instead of a camera. The project has taught me a lot about inverse trigonometry, how to create linkages, and how to make a simple app that can communicate with a robot.
+
+If I were to improve this project in the future, I would definitely look into alternative methods of sight-reading, such as perhaps creating my own OMR system that can handle less precise images from a camera. Additionally, I would create a system that relied on 13 solenoids (similar to the [Piano-Playing Robot](#research-other-robot-pianos)) to play each key instead of the current two servo arrangement because that would allow Mozart to play multiple notes at once, and play accidentals. Lastly, I would create an enclosed case for Mozart to make it easier to transport and store.
+
+<YouTube youTubeId="_tr8NorYv0Q" />
+
+<YouTube youTubeId="0BImsrIg-Og" />
